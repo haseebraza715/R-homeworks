@@ -1,0 +1,21 @@
+# Load the CSV file
+data <- read.csv("sample_data_week7.csv")
+
+# Display the data to check if it loaded correctly
+print(data)
+
+
+# Histogram of time spent watching movies/series
+hist(data$movies_series, 
+     main = "Time Spent Watching Movies/Series on an Average Weekday",
+     xlab = "Hours",
+     ylab = "Frequency",
+     col = "lightblue",
+     border = "black")
+
+
+# Perform a one-sample t-test
+t_test_result <- t.test(data$movies_series, mu = 1, alternative = "greater")
+
+# Display the result of the t-test
+print(t_test_result)
