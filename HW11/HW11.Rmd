@@ -1,0 +1,74 @@
+---
+title: "MLE"
+author: "Haseeb Raza"
+date: "2024-11-26"
+output: html_document
+---
+
+```{r}
+#The MLE for ϑ is the maximum of the observations.
+# Observations
+data <- c(1.8, 2, 3, 3.2, 3.4)
+
+# MLE of theta
+theta_ML <- max(data)
+print(theta_ML)
+
+
+# Set parameters for the simulation
+theta_true <- 4  # True value of theta
+n <- 5  # Sample size
+num_simulations <- 10000  # Number of simulations
+
+
+
+# Simulate the distribution of theta_ML
+set.seed(123)  # For reproducibility
+simulations <- replicate(num_simulations, {
+  sample <- runif(n, min = 0, max = theta_true)
+  max(sample)
+})
+
+# Visualize the distribution
+hist(simulations, breaks = 30, probability = TRUE, 
+     main = "Distribution of theta_ML", 
+     xlab = expression(theta[ML]), col = "lightblue")
+
+# Overlay the theoretical density (optional, requires symbolic derivation)
+
+# Compute quantiles of theta_ML
+lower_quantile <- quantile(simulations, 0.025)
+upper_quantile <- quantile(simulations, 0.975)
+
+cat("Quantiles of theta_ML (2.5% and 97.5%):", lower_quantile, "-", upper_quantile, "\n")
+
+
+# Confidence level
+alpha <- 0.05  # For 95% CI
+
+# General confidence interval formula
+lower_bound <- theta_ML / (1 - alpha / 2)^(1 / n)
+upper_bound <- theta_ML / (alpha / 2)^(1 / n)
+
+cat("95% Confidence Interval for theta:", lower_bound, "-", upper_bound, "\n")
+
+
+# Simulation check for confidence interval coverage
+coverage <- replicate(num_simulations, {
+  sample <- runif(n, min = 0, max = theta_true)
+  theta_ML_sim <- max(sample)
+  
+  lower_sim <- theta_ML_sim / (1 - alpha / 2)^(1 / n)
+  upper_sim <- theta_ML_sim / (alpha / 2)^(1 / n)
+  
+  theta_true >= lower_sim && theta_true <= upper_sim
+})
+
+# Calculate coverage probability
+coverage_probability <- mean(coverage)
+cat("Coverage probability of the confidence interval:", coverage_probability, "\n")
+
+
+
+```
+
