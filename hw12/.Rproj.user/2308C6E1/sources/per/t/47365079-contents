@@ -1,0 +1,120 @@
+---
+title: "Chi-Square Test Simulation"
+author: "Haseeb Raza"
+date: "2024-12-02"
+output: html_document
+---
+
+In this report, we estimate the strength of the χ²-test for a Poisson distribution with unknown parameter λ. The hypotheses are:
+
+- Null hypothesis (\(H_0\)): \(\lambda = 2\)  
+- Alternative hypothesis (\(H_1\)): \(\lambda \neq 2\)
+
+We compute the test statistic, determine the acceptance region, and estimate the strength of the test using simulation. The strength of the test is evaluated for two cases: \(\lambda = 3\) and \(\lambda = 5\).
+
+
+In this report, we estimate the strength of the χ²-test for a Poisson distribution with unknown parameter λ. The hypotheses are:
+
+- Null hypothesis (\(H_0\)): \(\lambda = 2\)  
+- Alternative hypothesis (\(H_1\)): \(\lambda \neq 2\)
+
+We compute the test statistic, determine the acceptance region, and estimate the strength of the test using simulation. The strength of the test is evaluated for two cases: \(\lambda = 3\) and \(\lambda = 5\).
+
+
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+set.seed(123) 
+
+# Simulating Data and Applying the χ²-Test
+
+# Parameters
+lambda_h0 <- 2
+sample_size <- 100
+alpha <- 0.05
+
+# Simulating a sample under H0
+sample_data <- rpois(sample_size, lambda_h0)
+
+# Observed frequencies
+observed <- table(factor(sample_data, levels = 0:max(sample_data)))
+
+# Expected frequencies under H0
+expected <- dpois(0:max(sample_data), lambda_h0) * sample_size
+
+# Chi-square test statistic
+test_stat <- sum((observed - expected)^2 / expected)
+test_stat
+
+# Acceptance Region
+# Degrees of freedom
+df <- length(expected) - 1
+
+# Chi-square critical values
+crit_lower <- qchisq(alpha / 2, df)
+crit_upper <- qchisq(1 - alpha / 2, df)
+
+cat("Acceptance region: [", crit_lower, ", ", crit_upper, "]\n")
+# Simulation under H0
+num_simulations <- 1000
+accept_null <- 0
+
+for (i in 1:num_simulations) {
+  sample_data <- rpois(sample_size, lambda_h0)
+  observed <- table(factor(sample_data, levels = 0:max(sample_data)))
+  expected <- dpois(0:max(sample_data), lambda_h0) * sample_size
+  test_stat <- sum((observed - expected)^2 / expected)
+  
+  if (crit_lower <= test_stat && test_stat <= crit_upper) {
+    accept_null <- accept_null + 1
+  }
+}
+
+proportion_accept_null <- accept_null / num_simulations
+proportion_accept_null
+
+lambda_true <- 3
+reject_null <- 0
+
+for (i in 1:num_simulations) {
+  sample_data <- rpois(sample_size, lambda_true)
+  observed <- table(factor(sample_data, levels = 0:max(sample_data)))
+  expected <- dpois(0:max(sample_data), lambda_h0) * sample_size
+  test_stat <- sum((observed - expected)^2 / expected)
+  
+  if (test_stat < crit_lower || test_stat > crit_upper) {
+    reject_null <- reject_null + 1
+  }
+}
+
+strength_lambda_3 <- reject_null / num_simulations
+strength_lambda_3
+
+lambda_true <- 5
+reject_null <- 0
+
+for (i in 1:num_simulations) {
+  sample_data <- rpois(sample_size, lambda_true)
+  observed <- table(factor(sample_data, levels = 0:max(sample_data)))
+  expected <- dpois(0:max(sample_data), lambda_h0) * sample_size
+  test_stat <- sum((observed - expected)^2 / expected)
+  
+  if (test_stat < crit_lower || test_stat > crit_upper) {
+    reject_null <- reject_null + 1
+  }
+}
+
+strength_lambda_5 <- reject_null / num_simulations
+strength_lambda_5
+
+
+```
+- **Proportion of acceptance under \(H_0\)**: `r proportion_accept_null`
+- **Strength of the test when \(\lambda = 3\)**: `r strength_lambda_3`
+- **Strength of the test when \(\lambda = 5\)**: `r strength_lambda_5`
+
+The strength of the test increases as \(\lambda\) deviates further from 2, indicating the test is more likely to reject the null hypothesis when the alternative hypothesis is true.
+
+
+
+
