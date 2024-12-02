@@ -1,0 +1,34 @@
+set.seed(123)
+
+# Generate random data for X and Y
+n <- 1000  # Number of samples
+X <- rnorm(n, mean = 5, sd = 2)  # X ~ N(5, 2^2)
+Y <- rnorm(n, mean = 3, sd = 3)  # Y ~ N(3, 3^2)
+
+# Display the first few values of X and Y
+head(X)
+head(Y)
+
+
+# Calculate Cov(Y - X, Y) and Var(X - Y)
+cov_YX <- cov(Y - X, Y)  # Cov(Y - X, Y)
+var_XY <- var(X - Y)     # Var(X - Y)
+
+cov_YX
+var_XY
+
+
+# Calculate alpha
+alpha <- cov_YX / var_XY
+alpha
+
+
+
+# Calculate Z = alpha*X + (1-alpha)*Y
+Z <- alpha * X + (1 - alpha) * Y
+
+# Calculate the variance of Z
+var_Z <- var(Z)
+var_Z
+
+
