@@ -1,0 +1,62 @@
+---
+title: "Linear Regression and Statistical Analysis"
+author: "Haseeb Raza"
+date: "2024-11-16"
+output: pdf_document
+
+---
+# Introduction
+
+This report combines all tasks required for the assignment. We use R to perform linear regression and statistical analysis, focusing on the relationship between time spent on sports, social media usage, and watching series/movies. Additionally, we assess model fit and test hypotheses about the explanatory variables.
+
+
+
+# Data
+
+We use the following dataset for analysis. If this dataset was collected in a previous assignment, replace the simulated data below with the actual data.
+
+```{r setup, echo=TRUE, message=FALSE}
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+
+# Simulated dataset
+set.seed(123)
+data <- data.frame(
+  sports_time = rnorm(50, mean = 10, sd = 3), # Dependent variable
+  social_media_time = rnorm(50, mean = 5, sd = 2), # Explanatory variable 1
+  series_time = rnorm(50, mean = 7, sd = 2.5) # Explanatory variable 2
+)
+
+# Display the first few rows of the dataset
+head(data)
+
+
+# Fit the linear regression model
+model <- lm(sports_time ~ social_media_time + series_time, data = data)
+
+# Display the summary of the model
+model_summary <- summary(model)
+model_summary
+
+# Extract coefficients
+coef(model)
+
+# Extract R-squared
+r_squared <- model_summary$r.squared
+r_squared
+
+
+# Extract coefficient and p-value for social_media_time
+social_media_coef <- model_summary$coefficients["social_media_time", ]
+social_media_coef
+
+# New data for prediction
+new_data <- data.frame(social_media_time = 6, series_time = 8)
+
+# Predict sports_time
+predicted_sports_time <- predict(model, newdata = new_data)
+predicted_sports_time
+
+
+```

@@ -1,0 +1,81 @@
+---
+title: "MLE and Method of Moments Estimation"
+author: "Haseeb Raza"
+date: "2024-11-20"
+output: html_document
+---
+
+```{r}
+# Load required libraries
+library(MASS)
+library(Matrix)
+library(ggplot2)
+library(dplyr)
+
+# Step 1: Generate Realistic Data
+# Define means and covariance matrix
+means <- c(10, 5, 7)  # Means for sports_time, social_media_time, series_time
+cov_matrix <- matrix(c(
+  9,  -4,  2,  # sports_time
+ -4,   4,  3,  # social_media_time
+  2,   3,  6   # series_time
+), ncol = 3)
+
+# Ensure the covariance matrix is positive definite
+if (any(eigen(cov_matrix)$values <= 0)) {
+  cov_matrix <- as.matrix(nearPD(cov_matrix)$mat)
+}
+
+# Generate multivariate normal data
+set.seed(123)
+data <- as.data.frame(mvrnorm(n = 100, mu = means, Sigma = cov_matrix))
+colnames(data) <- c("sports_time", "social_media_time", "series_time")
+
+# Step 2: Fit the Linear Model
+model <- lm(sports_time ~ social_media_time + series_time, data = data)
+model_summary <- summary(model)
+model_summary
+
+# Step 3: Extract Results
+intercept_and_coefficients <- coef(model)
+
+#answer question no 1 
+coefficients <- model_summary$coefficients
+coefficients
+
+
+#more specific 
+social_media_coef <- model_summary$coefficients["social_media_time", ]
+social_media_coef
+
+
+#answer question no 2
+r_squared <- model_summary$r.squared
+r_squared
+
+
+# Step 4: Visualizations
+ggplot(data, aes(x = social_media_time, y = sports_time)) +
+  geom_point() +
+  geom_smooth(method = "lm", col = "red") +
+  labs(title = "Sports Time vs Social Media Time", x = "Social Media Time", y = "Sports Time")
+
+ggplot(data, aes(x = series_time, y = sports_time)) +
+  geom_point() +
+  geom_smooth(method = "lm", col = "green") +
+  labs(title = "Sports Time vs Series Time", x = "Series Time", y = "Sports Time")
+
+# Step 5: Hypothesis Test for Social Media Coefficient
+if (social_media_coef[4] < 0.05 && social_media_coef[1] < 0) {
+  cat("The coefficient for social_media_time is significantly negative (p-value <", social_media_coef[4], ").\n")
+} else {
+  cat("The coefficient for social_media_time is NOT significantly negative.\n")
+}
+
+# Step 6: Predictions
+new_data <- data.frame(social_media_time = c(6, 8), series_time = c(7, 10))
+predicted_values <- predict(model, newdata = new_data)
+cat("Predicted sports times:\n")
+print(data.frame(new_data, predicted_sports_time = predicted_values))
+
+```
