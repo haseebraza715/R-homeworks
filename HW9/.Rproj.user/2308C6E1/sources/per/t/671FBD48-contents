@@ -1,0 +1,91 @@
+---
+title: "MLE and Method of Moments Estimation for Uniform Distribution"
+author: "Haseeb Raza"
+date: "2024-11-13"
+output: html_document
+---
+
+```{r}
+
+# Setup
+set.seed(123)
+n_values <- c(10, 100, 1000)
+a_true <- 2
+n_sim <- 1000
+
+
+
+# Initialize matrices to store results
+mle_estimates <- matrix(NA, nrow = n_sim, ncol = length(n_values))
+mm_estimates <- matrix(NA, nrow = n_sim, ncol = length(n_values))
+
+# Simulation for different sample sizes
+for (i in seq_along(n_values)) {
+  n <- n_values[i]
+  for (j in 1:n_sim) {
+    sample <- runif(n, min = -3 * a_true, max = 2 * a_true)
+    mle_estimates[j, i] <- max(abs(min(sample) / 3), max(sample) / 2)
+    mm_estimates[j, i] <- -2 * mean(sample)
+  }
+}
+
+library(ggplot2)
+
+# Plot histograms for each estimator and sample size
+histogram_plots <- list()
+for (i in seq_along(n_values)) {
+  n <- n_values[i]
+  mle_data <- data.frame(estimator = mle_estimates[, i], type = "MLE", n = n)
+  mm_data <- data.frame(estimator = mm_estimates[, i], type = "MM", n = n)
+  
+  # MLE Histogram
+  mle_hist_plot <- ggplot(mle_data, aes(x = estimator)) +
+    geom_histogram(bins = 30, fill = "blue", alpha = 0.5) +
+    ggtitle(paste("Histogram of MLE estimates for n =", n)) +
+    xlab("Estimator Value") +
+    theme_minimal()
+  histogram_plots[[paste("MLE", n)]] <- mle_hist_plot
+  
+  # MM Histogram
+  mm_hist_plot <- ggplot(mm_data, aes(x = estimator)) +
+    geom_histogram(bins = 30, fill = "red", alpha = 0.5) +
+    ggtitle(paste("Histogram of MM estimates for n =", n)) +
+    xlab("Estimator Value") +
+    theme_minimal()
+  histogram_plots[[paste("MM", n)]] <- mm_hist_plot
+}
+
+# Print all histogram plots
+for (plot_name in names(histogram_plots)) {
+  print(histogram_plots[[plot_name]])
+}
+
+
+# Calculate empirical variances
+mle_var <- apply(mle_estimates, 2, var)
+mm_var <- apply(mm_estimates, 2, var)
+var_data <- data.frame(n = rep(n_values, each = 2),
+                       variance = c(mle_var, mm_var),
+                       estimator = rep(c("MLE", "MM"), times = length(n_values)))
+
+# Plot empirical variances on log scale
+variance_plot <- ggplot(var_data, aes(x = n, y = variance, color = estimator)) +
+  geom_line() +
+  geom_point() +
+  scale_y_log10() +
+  labs(title = "Empirical Variance of MLE and MM Estimators", x = "Sample Size (n)", y = "Empirical Variance (log scale)") +
+  theme_minimal()
+
+print(variance_plot)
+
+
+
+
+
+
+
+
+
+
+```
+
